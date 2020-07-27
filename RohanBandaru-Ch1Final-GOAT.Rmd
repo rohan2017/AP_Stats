@@ -1,0 +1,402 @@
+---
+title: "Rohan Bandaru - Ch1 Final Submission GOAT Project"
+output: html_notebook
+---
+
+This is an R notebook. It is my first time using R and I learned a lot about
+practical application of statistics. I also used Python for some 
+pre-processing (filtering csv files) allowing me to use hundreds of data points.
+
+# Intro
+
+I chose tennis as my sport and listed the following players as contenders for
+the "Greates Of All Time" title. 
+
+Roger Federer	 -SUI
+Novak Djokovic -SRB
+Rafael Nadal	 -ESP
+Ivan Lendl	   -USA
+Jimmy Connors	 -USA
+Pete Sampras	 -USA
+John McEnroe	 -USA
+Bjorn Borg	   -SWE
+Andre Agassi	 -USA
+Borris Becker	 -GER
+
+There are a few things I wanted to consider when choosing the GOAT:
+
+- game skill
+- how long they were good
+- consistency (inter-game variability)
+
+These qualities are what led me to choose the statistics below:
+
+No. Grand Slams Won, No. Big Titles Won (GS, TF, M), Games Played, Games Won, 
+Matches Played, Matches Won, Weeks at #1, Hard Court Win %, Clay Court Win %, 
+Grass Court Win %, Carpet Court Win %, Elo (rating), Match time
+*I didn't use all these statistics in my final analysis because there was no
+easy way I could pull come of them off the website
+
+The reason why I am not doing win rate or win/loss ratio, is because I believe
+that the title of GOAT should be based on the total amount of wins and titles 
+accumulated over time. A player may win all his matches but if he only plays in
+one title, he should not become the GOAT. 
+
+I also gathered the raw data (score, surface, and duration) from every game 
+they ever played (that was recorded).
+
+To compare the players, I will take a weighted combination of their Z-scores 
+for each statistic
+
+Source: https://www.ultimatetennisstatistics.com/
+
+# Setting Up Environment
+
+```{r}
+setwd("~/Documents/AP Stats")
+```
+
+# Statistic 1 - Number of Grand Slam Titles Won
+
+Grand Slam Titles are the highest level of competition in tennis: 
+US Open, Australian Open, French Open(Roland Garros), and Wimbledon. 
+
+```{r}
+overallstats <- read.csv(file = 'overallstats.csv')
+
+grandslams <- overallstats[["GrandSlams"]]
+names(grandslams) <- overallstats[["PlayerName"]]
+
+par(mar=c(7.5, 4.1, 1, 1))
+barplot(sort(grandslams, decreasing = TRUE), las=3, ylab="GS Titles Won")
+```
+Calculate Z-Scores (Normalize Distribution)
+```{r}
+m = mean(grandslams)
+stdv = sd(grandslams)
+
+print(paste0("Mean GS Titles Won: ", m))
+print(paste0("Standard Deviation: ", stdv))
+print("Z-scores:")
+# zs = (grandslams - m)/stdv
+# summary(zs)
+zscores_gs = scale(grandslams)
+print(zscores_gs)
+```
+Total GS Titles Won In The Entire Group
+```{r}
+stem(grandslams)
+```
+A lot of the players have below 10 titles, and it quickly narrows down to the 
+few top-players. 
+
+# Statistic 2 - Number of Big Titles Won
+
+Big Titles include Grand Slams(Majors), Tour Finals, Olympic Titles, etc. 
+
+```{r}
+bigtitles <- overallstats[["BigTitles"]]
+names(bigtitles) <- overallstats[["PlayerName"]]
+
+par(mar=c(7, 4.1, 1, 1))
+barplot(sort(bigtitles, decreasing = TRUE), las=3, ylab="Big Titles Won")
+```
+Calculate Z-Scores (Normalize Distribution)
+```{r}
+m = mean(bigtitles)
+stdv = sd(bigtitles)
+
+print(paste0("Mean Big Titles Won: ", m))
+print(paste0("Standard Deviation: ", stdv))
+print("Z-scores:")
+zscores_bt = scale(bigtitles)
+print(zscores_bt)
+```
+
+# Statistic 3 - Games Won
+
+```{r}
+gameswon <- overallstats[["GamesWon"]]
+names(gameswon) <- overallstats[["PlayerName"]]
+
+par(mar=c(7, 4.1, 1, 1))
+barplot(sort(gameswon, decreasing = TRUE), las=3, ylab="Games Won")
+```
+Calculate Z-Scores (Normalize Distribution)
+```{r}
+m = mean(gameswon)
+stdv = sd(gameswon)
+
+print(paste0("Mean Games Won: ", m))
+print(paste0("Standard Deviation: ", stdv))
+print("Z-scores:")
+zscores_gw = scale(gameswon)
+print(zscores_gw)
+```
+
+# Statistic 4 - Matches Won
+
+```{r}
+matcheswon <- overallstats[["MatchesWon"]]
+names(matcheswon) <- overallstats[["PlayerName"]]
+
+par(mar=c(7, 4.1, 1, 1))
+barplot(sort(matcheswon, decreasing = TRUE), las=3, ylab="Matches Won")
+```
+Calculate Z-Scores (Normalize Distribution)
+```{r}
+m = mean(matcheswon)
+stdv = sd(matcheswon)
+
+print(paste0("Mean Matches Won: ", m))
+print(paste0("Standard Deviation: ", stdv))
+print("Z-scores:")
+zscores_mw = scale(matcheswon)
+print(zscores_mw)
+```
+
+# Statistic 5 - Weeks At #1 Rank
+
+```{r}
+weeksatone <- overallstats[["WeeksAt1"]]
+names(weeksatone) <- overallstats[["PlayerName"]]
+
+par(mar=c(7, 4.1, 1, 1))
+barplot(sort(weeksatone, decreasing = TRUE), las=3, ylab="Weeks At #1")
+```
+Calculate Z-Scores (Normalize Distribution)
+```{r}
+m = mean(weeksatone)
+stdv = sd(weeksatone)
+
+print(paste0("Mean Weeks At The #1 Rank: ", m))
+print(paste0("Standard Deviation: ", stdv))
+print("Z-scores:")
+zscores_wao = scale(weeksatone)
+print(zscores_wao)
+```
+
+# Statistic 6 - Average Game Score Difference (Variability)
+
+## Roger Federer
+```{r}
+RFmatches <- read.csv(file = 'Tennis Player Matches/1RFMatches.csv')
+gamedifferencepermatch <- RFmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Federer -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Novak Djokovic
+```{r}
+NDmatches <- read.csv(file = 'Tennis Player Matches/2NDMatches.csv')
+gamedifferencepermatch <- NDmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Djokovic -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Rafael Nadal
+```{r}
+RNmatches <- read.csv(file = 'Tennis Player Matches/3RNMatches.csv')
+gamedifferencepermatch <- RNmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Nadal -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Ivan Lendl
+```{r}
+ILmatches <- read.csv(file = 'Tennis Player Matches/4ILMatches.csv')
+gamedifferencepermatch <- ILmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Lendl -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Jimmy Connors
+```{r}
+JCmatches <- read.csv(file = 'Tennis Player Matches/5JCMatches.csv')
+gamedifferencepermatch <- JCmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Connors -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Pete Sampras
+```{r}
+PSmatches <- read.csv(file = 'Tennis Player Matches/6PSMatches.csv')
+gamedifferencepermatch <- PSmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Sampras -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## John McEnroe
+```{r}
+JMmatches <- read.csv(file = 'Tennis Player Matches/7JMMatches.csv')
+gamedifferencepermatch <- JMmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "McEnroe -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Bjorn Borg
+```{r}
+BBmatches <- read.csv(file = 'Tennis Player Matches/8BBMatches.csv')
+gamedifferencepermatch <- BBmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Borg -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Andre Agassi
+```{r}
+AAmatches <- read.csv(file = 'Tennis Player Matches/9AAMatches.csv')
+gamedifferencepermatch <- AAmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Agassi -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+
+## Borris Becker
+```{r}
+BKmatches <- read.csv(file = 'Tennis Player Matches/10BBckMatches.csv')
+gamedifferencepermatch <- BKmatches[["GameDifference"]]
+hist(gamedifferencepermatch, xlab = "Difference In Games Won", main = "Becker -- Games Won-Lost Every Match", breaks = 15)
+```
+Calculate "Variability" And Notice Distribution Shape
+```{r}
+m = mean(gamedifferencepermatch)
+stdv = sd(gamedifferencepermatch)
+
+summary(gamedifferencepermatch)
+print(paste0("Standard Deviation: ", stdv))
+```
+Distribution Shape:
+
+I noticed that the distributions seen above all had a very similar shape. 
+One tall hump on the positive side of 0, and a smaller flat hump on the 
+negative side. I think the reason for these two humps is because a player can 
+either win or lose a match. If he won a match, he would most likely have won 
+more games than his opponent and vice versa. Overall the distributions are very 
+skewed left which is to be expected considering the players win/loss ratio. 
+Because all the shapes are so similar, the only way I really compared them was 
+by the height of the humps (# games won) in which case Federer is the winner. 
+
+Normalize (Take Z-Scores)
+```{r}
+zs = c(4.80976431016085, 4.92418661319707, 5.11033557083605, 5.34604513444406, 5.28898042288614, 4.90347635797912, 5.1580742185318, 5.69334612535673, 5.662244099766, 5.20370473981154)
+names(zs) = overallstats[["PlayerName"]]
+
+scale(zs)
+
+```
+
+
+# Final Tallying
+
+Weights I Determined:
+Weight For Grand Slam Titles - 0.9
+Weight For Big Titles - 0.8
+Weight For Games Won - 0.7
+Weight For Matches Won - 0.9
+Weight For Weeks at #1 - 0.9
+Weight For Game Winning Consistency(sd) - 0.5
+
+Grand Slams, Big Titles, Games Won, Matches Won, Weeks at #1, Game Winning Consistency
+Roger Federer	 -SUI
+1.5508857 * 0.9 + 1.30636863 * 0.8 + 1.6581025 * 0.7 + 1.4562820 * 0.9 + 1.08405782 * 0.9 - 1.3330217 * 0.5
+= 5.221358772
+Novak Djokovic -SRB
+0.9834885 * 0.9 + 1.46568187 * 0.8 - 0.1711528 * 0.7 - 0.1005984 * 0.9 + 0.80404288 * 0.9 - 0.9519427 * 0.5
+= 2.095006868
+Rafael Nadal	 -ESP
+1.3617533 * 0.9 + 1.38602525 * 0.8 + 0.0559132 * 0.7 + 0.2682625 * 0.9 + 0.07400395 * 0.9 - 0.3319809 * 0.5
+= 2.515586765
+Ivan Lendl	   -USA
+-0.7187031 * 0.9 - 0.04779397 * 0.8 + 0.6506236 * 0.7 + 0.6658658 * 0.9 + 0.68403648 * 0.9 + 0.4530405 * 0.5
+= 1.211800856
+Jimmy Connors	 -USA
+-0.7187031 * 0.9 - 0.76470359 * 0.8 + 1.3992183 * 0.7 + 1.5472996 * 0.9 + 0.65403488 * 0.9 + 0.2629887 * 0.5
+= 1.83355253
+Pete Sampras	 -USA
+0.4160913 * 0.9 - 0.44607709 * 0.8 - 0.6125576 * 0.7 - 0.8143682 * 0.9 + 0.84404502 * 0.9 - 1.0209174 * 0.5
+= -0.894919384
+John McEnroe	 -USA
+-0.9078355 * 0.9 - 0.28676384 * 0.8 - 0.3640866 * 0.7 - 0.2443105 * 0.9 - 0.31601685 * 0.9 - 0.1729893 * 0.5
+= -1.892112907
+Bjorn Borg	   -SWE
+-0.1513059 * 0.9 - 0.68504696 * 0.8 - 1.5908215 * 0.7 - 1.4275396 * 0.9 - 0.92604939 * 0.9 + 1.6097128 * 0.5
+= -3.111161619
+Andre Agassi	 -USA
+-0.7187031 * 0.9 - 0.84436021 * 0.8 - 0.1430950 * 0.7 - 0.2970049 * 0.9 - 1.00605366 * 0.9 + 1.5061287 * 0.5
+= -1.842175812
+Borris Becker	 -GER
+-1.0969679 * 0.9 - 1.08333008 * 0.8 - 0.8821442 * 0.7 - 1.0538883 * 0.9 - 1.89610113 * 0.9 - 0.0210186 * 0.5
+= -5.136935901
+
+# Visualization Of Ranking
+```{r}
+players = c(5.221358772, 2.095006868, 2.515586765, 1.211800856, 1.83355253, -0.894919384, -1.892112907, -3.111161619, -1.842175812, -5.136935901)
+names(players) = overallstats[["PlayerName"]]
+par(mar=c(7, 4.1, 1, 1))
+barplot(sort(players, decreasing = TRUE), las=3, ylab="Rohan's Tennis GOAT Score")
+```
+So in the end, Roger Federer is officially the GOAT of Mens Tennis 
+(according to me). I actually got surprisingly similar results to the 
+website that I got my data from which also has a GOAT ranking. 
