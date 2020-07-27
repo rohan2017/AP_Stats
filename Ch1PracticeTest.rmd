@@ -1,0 +1,65 @@
+---
+title: "Practice Test Ch1"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+wages = c(21419
+
+,20969
+
+,22644
+
+,25610
+
+,29132
+
+,25160
+
+,27224
+
+,24640
+
+,26015
+
+,41480
+
+,22482
+
+,25892
+
+,22341
+
+,25788
+
+,25845)
+
+median(wages)
+
+```
+```{r}
+heights = c(69, 72, 71, 66, 76, 74, 71, 66, 68, 67, 70, 70)
+sd(heights)
+```
+```{r}
+hotdogs = c(11, 27, 29, 35, 37, 39, 40, 42, 45, 47, 49, 49, 52, 52, 56, 64, 67, 71)
+mean(hotdogs)
+mode(hotdogs)
+range(hotdogs)
+```
+```{r}
+mm = c(5.35, 5.32, 5.29, 5.31, 5.25)
+cd = c(5.95, 5.9, 5.83, 5.83, 5.78)
+range(mm)
+range(cd)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
