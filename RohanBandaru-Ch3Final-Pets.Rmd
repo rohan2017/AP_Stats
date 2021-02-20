@@ -1,0 +1,177 @@
+---
+title: "Ch3 Final Project - Pets are humans too"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+### Rohan Bandaru
+
+## Step 1
+
+```{r}
+humanlife = c(0.05, 1.5, 14, 16, 79)
+bearlife = c(0.08, 2.5, 5.5, 5.5, 27)
+
+plot(x = bearlife, y = humanlife,
+   xlab = "Polar Bear Age",
+   ylab = "Human Age",
+   main = "Polar Bear vs Human life stages"
+)
+
+print(paste0("r (correlation coefficient) is ", cor(humanlife, bearlife)))
+
+```
+
+
+My explanatory variable is the age of the animal(Polar Bear) in years. My response variable is the age of a human in years corresponding to the developmental stage of the Polar Bear. I did this because the goal of this project is to find out what an animals "human age" is. 
+
+r = 0.997, indicating that there is a strong positive correlation between human and Polar Bear age. 
+
+## Step 2
+
+#### Finding the regression line:
+
+```{r}
+
+regressionline <- lm(humanlife ~ bearlife)
+plot(x = bearlife, y = humanlife, ylab="Human Age", xlab="Polar Bear Age", 
+     main="Least-squares Regression Line")
+abline(-2.330, 3.011)
+
+```
+
+The least-squares regression equation is:
+ŷ = 3.011x - 2.33 or [human age] = 3.011(slope) x [bear age] - 2.33(intercept)
+
+#### Predictions
+
+Using this equation, the animals predicted human age corresponding to an age of 20 years is 57.89 years.
+
+The animals age corresponding to a human age of 70 is 24.02 years. 
+
+These values seem pretty realistic, as the average lifespan of a Polar Bear is 27, vs 79 for humans. 
+
+For any Polar Bear age x, where 0 < x < 27, this model is a good predictor.
+
+```{r}
+print(paste0("R Squared (coefficient of determination) is ", summary(regressionline)$r.squared))
+
+```
+
+```{r}
+residuals = resid(regressionline)
+print(paste0("Standard deviation of the residuals is ", sd(residuals)))
+```
+
+```{r}
+plot(bearlife, residuals, 
+     ylab="Residuals", xlab="Polar Bear Age", 
+     main="Residual Plot")
+abline(0, 0)  
+```
+From this information, it seems like a linear model is a good fit. R squared is 99.5% and There is no apparent pattern in the residuals. 
+
+
+## Step 3
+
+
+#### Transformation 1 - x vs ln(y)  (Exponential)
+
+Regression Equation is: ŷ = 1.21^x / 1.14
+
+```{r}
+transformationln <- function(x){
+return(log(x))
+}
+
+lny <- unlist(lapply(humanlife, transformationln))
+
+regressionlinet1 <- lm(lny ~ bearlife)
+plot(x = bearlife, y = lny, ylab="Ln(Human Age)", xlab="Polar Bear Age", 
+     main="Transformed Plot")
+
+print(paste0("R Squared (coefficient of determination) is ", summary(regressionlinet1)$r.squared))
+
+```
+
+```{r}
+
+calcpredictedyt1 <- function(x){
+return(1.21^x/1.14)
+}
+
+predictedy <- unlist(lapply(bearlife, calcpredictedyt1)) 
+
+residualst1 = c(0.8406724, -0.0872719, -11.49727, -13.49727, 71.76487)
+plot(bearlife, residualst1, 
+     ylab="Residuals", xlab="Polar Bear Age", 
+     main="Residual Plot")
+abline(0, 0)  
+
+```
+
+There is a V pattern in the residuals, indicating that this model is not the best fit.
+
+
+#### Transformation 2 - ln(x) vs ln(y)  (Power)
+
+Regression Equation is: y = 1.124x^1.296
+
+```{r}
+
+lnx <- unlist(lapply(bearlife, transformationln))
+lny <- unlist(lapply(humanlife, transformationln))
+
+regressionlinet2 <- lm(lny ~ lnx)
+
+plot(x = lnx, y = lny, ylab="Ln(Human Age)", xlab="Ln(Polar Bear Age)", 
+     main="Transformed Plot")
+
+print(paste0("R Squared (coefficient of determination) is ", summary(regressionlinet2)$r.squared))
+
+```
+
+```{r}
+
+calcpredictedyt2 <- function(x){
+return(x^1.296*1.124)
+}
+
+predictedy <- unlist(lapply(bearlife, calcpredictedyt2))
+
+residualst2 = c(-0.0074234, 2.185501, -3.760556, -5.760556, 1.503312)
+plot(bearlife, residualst2, 
+     ylab="Residuals", xlab="Polar Bear Age", 
+     main="Residual Plot")
+abline(0, 0)  
+```
+
+There is a V pattern in the residuals, indicating that this model is not the best fit.
+
+### Finding the best model
+
+Based on the above findings, it is clear that a linear model is the best fit. This is what I expected as most animal growth follows the same trajectory. 
+
+The linear model had the best coefficient of determination of 99.5% compared to 53.5% and 96.5% of the other two models.
+
+It is also easy to see that the transformed scatterplots are no where near as linear as the original non-transformed model. 
+
+In addition, the residual plot for the linear model has no apparent pattern, whereas there are clear V patterns in the residuals of the other models. 
+
+### Table
+
+```{r}
+calcpredictedy <- function(x){
+return(3.011*x-2.33)
+}
+
+bearages = c(0.08, 1, 2.5, 3.5, 5.5, 6.5, 7.5, 8.5, 9.5, 10.5, 11.5, 15, 20, 25, 27)
+predictedys <- unlist(lapply(bearages, calcpredictedy))
+
+print(paste0("Bear Age", paste0("      ", "Predicted Human Age")))
+for (i in 1:length(bearages)) {
+  print(paste0(bearages[i], paste0("      ", predictedys[i])))
+}
+
+```

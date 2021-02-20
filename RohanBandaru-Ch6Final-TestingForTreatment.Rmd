@@ -1,0 +1,89 @@
+---
+title: "Ch6 Final Project - Testing For Treatment"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+### Rohan Bandaru
+
+## Step 1
+#### Part 1
+
+I will investigate the Cologuard test because it has a nice false-positive rate of 10%. The expected number of false positives in a group of five patients is 5 x 0.1 = 0.5
+
+I will simulate 20 groups of 5 tests using R's built in random number function. 1 means a false positive and 0 means no false positive. 
+```{r}
+fulltable = c()
+for(i in 1:20) {
+  testresults = rbinom(5, 1, 0.1)
+  fulltable = c(fulltable, c(i, c(testresults, sum(testresults))))
+}
+asmatrix <- matrix(fulltable, ncol=7, byrow=TRUE)
+colnames(asmatrix) = c("Group ", " Test 1 ", " Test 2 ", " Test 3 ", " Test 4 ", " Test 5 ", " Total")
+rownames(asmatrix) <- c("","","","","","","","","","","","","","","","","","","","")
+as.table(asmatrix)
+```
+#### Part 2
+From the simulated results above, I created this probability distribution:
+```{r}
+tests <- c(0, 1, 1, 1, 0, 0, 2, 1, 2, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0)
+probabilitydistribution <- c("0", "1", "2", "3", "4", "5", 0.5, 0.4, 0.1, 0, 0, 0)
+asmatrix <- matrix(probabilitydistribution, ncol=6, byrow=TRUE)
+rownames(asmatrix) <- c("X", "P(X)")
+colnames(asmatrix) <- c("", "", "", "", "", "")
+as.table(asmatrix)
+
+print(paste0("The simulated expected number of false positives(mean) is ", mean(tests)))
+print(paste0("The simulated variation of false positives(standard deviation) is ", sd(tests)))
+```
+Expected value = 0.5 x 0 + 0.4 x 1 + 0.1 x 2 + 0 x 3 + 0 x 4 + 0 x 5 = 0.6
+
+Standard deviation = sqrt((0-0.6)^2 x 0.5 + (1-0.6)^2 x 0.4 + (2-0.6)^2 x 0.1) = 0.681
+
+## Step 2
+To find the mean and standard deviation of X x 2100, I simply multiply the mean and standard deviation by 2100
+```{r}
+print(paste0("The simulated expected unnecessary cost(mean) is ", mean(tests)*2100))
+print(paste0("The simulated variation of unnecessary costs(standard deviation) is ", sd(tests)*2100))
+```
+
+
+## Step 3
+#### Part 1
+I created this probability distribution from the binomial distribution formulas, not a simulation. 
+```{r}
+x <- c("0", "1", "2", "3", "4", "5")
+y <- c(0.59049, 0.32805, 0.0729, 0.0081, 0.00045, 0.00001)
+probabilitydistribution <- c(x, y)
+asmatrix <- matrix(probabilitydistribution, ncol=6, byrow=TRUE)
+rownames(asmatrix) <- c("X", "P(X)")
+colnames(asmatrix) <- c("", "", "", "", "", "")
+as.table(asmatrix)
+plot(x, y, type="p", xlab="X", ylab="P(X)")
+```
+1. It is in the shape of a binomial distribution
+
+2. The expected number of false positives in a group of 5 is 0.5. 5 x 0.1 = 0.5
+
+3. They were quite close to each other, with the simulated value being 0.6. This is less than 1/4 standard deviations away. 
+
+#### Part 2
+This probability distribution is the probability that each trial is the first false positive. 
+```{r}
+x <- c("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+y <- c(0.1, 0.9*0.1, 0.9^2*0.1, 0.9^3*0.1, 0.9^4*0.1, 0.9^5*0.1, 0.9^6*0.1, 0.9^7*0.1, 0.9^8*0.1, 0.9^9*0.1, 0.9^10*0.1)
+probabilitydistribution <- c(x, y)
+asmatrix <- matrix(probabilitydistribution, ncol=11, byrow=TRUE)
+rownames(asmatrix) <- c("Y", "P(Y)")
+colnames(asmatrix) <- c("", "", "", "", "", "", "", "", "", "", "")
+as.table(asmatrix)
+plot(x, y, type="p", xlab="Y", ylab="P(Y)")
+```
+1. It is in the shape of a geometric distribution
+
+2. The expected number of tests to get a false positive is 10. 1/0.1 = 10
+
+
+### Conclusion
+In conclusion, I recommend the Cologuard test. It only has a 10% chance of giving a false positive, thus the expected number of tests before you get a false positive is 10. Also, the predicted unnecessary cost is $210 per test ($252 according to simulations), and over 5 tests, $1050 ($1260 according to simulations). I'd say that is a reasonable price for detecting colon cancer that could otherwise be fatal. 

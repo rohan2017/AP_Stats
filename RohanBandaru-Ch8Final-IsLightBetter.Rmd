@@ -1,0 +1,92 @@
+---
+title: "Ch8 Final Project - Is Light Better"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+### Rohan Bandaru
+
+## Step 1
+
+I calculated the % daily value of sugar and calories for 15 popular cereals at the supermarket. Then, I normalized all of the values to a serving size of 0.75 cups. 
+```{r}
+cerealdata <- c("Standard Toasty Flakes", "0.75 cups", "180", "10%",
+                "Cheerios", "0.75 cups", "75", "5.25%",
+                "Cinnamon Toast Crunch", "0.75 cups", "130", "8%",
+                "Life", "0.75 cups", "120", "8%",
+                "Honey Nut Cheerios", "0.75 cups", "110", "7%",
+                "Lucky Charms", "0.75 cups", "110", "7%",
+                "Frosted Flakes", "0.75 cups", "110", "9%",
+                "Special K", "0.75 cups", "120", "6%",
+                "Fruit Loops", "0.75 cups", "82.5", "9%",
+                "Fruity Pebbles", "0.75 cups", "120", "8%",
+                "Cocoa Pebbles", "0.75 cups", "119", "8%",
+                "Raisin Bran", "0.75 cups", "139", "11.25%",
+                "Corn Flakes", "0.75 cups", "75", "6%",
+                "Golden Grahams", "0.75 cups", "120", "9%",
+                "Rice Krispies", "0.75 cups", "100", "8.6%")
+asmatrix <- matrix(cerealdata, ncol=4, byrow=TRUE)
+rownames(asmatrix) <- c("", "", "", "", "", "", "", "", "", "", "", "", "", "", "")
+colnames(asmatrix) <- c("Cereal Name", "Serving Size", "Calories", "%DV Total Carbohydrates")
+as.table(asmatrix)
+```
+
+## Step 2
+
+### Part 1 - State
+I need to calculate a 99% confidence interval for the mean %DV of carbohydrates from a sample of 15 cereals. In other words, I need to define an interval such that 99% of samples of size 15 will have a mean within the interval. It is safe to assume that the random condition is met (there are more than 150 cereals). However, the large sample condition is not met, as I am only sampling 15 cereals (15<30), however the data seems relatively normal, thus I can apply the following formula.  
+
+### Part 2 - Plan
+I will use the formula x +- t*s/sqrt(n) where x is the sample mean, s is the sample sd, t is the critical value, and n is the sample size, so 15. I will calculate t using the invT function on my calculator, with a 0.99 center area and a degree of freedom of 14 (n-1). 
+
+### Part 3 - Do
+```{r}
+dvs = c(10, 5.25, 8, 8, 7, 7, 9, 6, 9, 8, 8, 11.25, 6, 9, 8.6)
+print(paste0("Sample mean is: ", mean(dvs)))
+print(paste0("Sample standard deviation is: ", sd(dvs)))
+print(paste0("Critical value is: ", 2.977))
+print(paste0("Square root of n is: ", 3.873))
+```
+Therefore, my margin of error is:
+
+2.977 * 1.592/3.873 = 1.224
+
+and my confidence interval is:
+
+8.007 +- 1.22 = 6.783% to 9.231% of daily carbohydrates
+
+### Part 4 - Conclude
+From this confidence interval, it seems logical to consider a carbohydrate %DV of 5 as light. A value of 5% is over an entire margin of error away from the lower bound of the 99% confidence interval. In other words, 99% of samples of 15 cereals will have a mean carbohydrate content that is at least 1.2% higher than Toast Flakes Light. Therefore, in terms of sugar content, Toast Flakes Light can be considered a light cereal.
+
+
+## Step 3
+
+### Part 1 - State
+I need to calculate a 99% confidence interval for the mean calories from a sample of 15 cereals. In other words, I need to define an interval such that 99% of samples of size 15 will have a mean calories within the interval. Like in Step 2, I'll assume that the random condition is met (there are more than 15*10 cereals). However, the large sample condition is not met, as I am only sampling 15 cereals (15<30), however the data seems relatively normal, thus I can apply the following formula.  
+
+### Part 2 - Plan
+I will use the formula x +- t*s/sqrt(n) where x is the sample mean, s is the sample sd, t is the critical value, and n is the sample size, so 15. I will calculate t using the invT function on my calculator, with a 0.99 center area and a degree of freedom of 14 (n-1). 
+
+### Part 3 - Do
+```{r}
+dvs = c(180, 75, 130, 120, 110, 110, 110, 120, 82.5, 120, 119, 139, 75, 120, 100)
+print(paste0("Sample mean is: ", mean(dvs)))
+print(paste0("Sample standard deviation is: ", sd(dvs)))
+print(paste0("Critical value is: ", 2.977))
+print(paste0("Square root of n is: ", 3.873))
+```
+Therefore, my margin of error is:
+
+2.977 * 26.301/3.873 = 20.216
+
+and my confidence interval is:
+
+114.033 +- 20.216 = 93.817 calories to 134.249 calories
+
+### Part 4 - Conclude
+From this confidence interval, I would not consider Toasty Flakes Light to be a light cereal, as 130 calories is well within the 99% confidence interval, and is in fact greater than the sample average of 114 calories. In other words, 99% of samples of 15 cereals will have a mean calorie content that is less than Toast Flakes Light.  
+
+
+## Conclusion
+While I would say that Toasty Flakes Light has a low sugar content, I would not consider it to be a light cereal, due to it's high calories. Yes, Toasty Flakes Light was below the lower bound of the 99% confidence interval for mean %daily carbohydrates, however it fell well in the upper half of the 99% confidence interval for mean calories. Thus, while it may be healthier than most other cereals, it has too many calories when compared to other cereals to be considered light. If I were to redo this project, I would probably want to more precisely define what makes a  cereal "light".

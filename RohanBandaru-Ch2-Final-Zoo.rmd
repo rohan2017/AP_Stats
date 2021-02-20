@@ -1,0 +1,133 @@
+---
+title: "Chapter 2 Project - Who Joined The Zoo?"
+output: html_notebook
+---
+To hide all the code in this notebook, click the button in the top right corner ->
+
+By Rohan Bandaru
+
+
+###Summary:
+A mystery animal has been born in the Zoo. There are only a few possibilities for what it could be. Using data about the mystery animal, determine what species the mystery animal most likely is.
+
+
+####Mystery Animal Data:
+
+Gestation Period: 248 days 
+
+Weight: 2 Pounds 
+
+Length: 11 Inches 
+
+
+##Step 1:
+
+Based on briefly looking at the gestation period data*, my top three animals are:
+
+Chimpanzee
+
+Gorilla
+
+Polar Bear
+
+*I also looked at the length/weight data to exclude animals that were unreasonable.
+
+####Simulate the birth of 20 babies for all 3 animals (Gaussian Random Number Generator)
+
+- The red line marks the gestation period (from the table) \n
+
+- The blue line marks the gestation period of the mystery animal \n
+
+```{r}
+# This line generates the random numbers
+chimpanzeeBirths <- rnorm(20, mean=243, sd=8)
+# This line graphs the results
+hist(chimpanzeeBirths, breaks=20, main="Simulated Chimp Births", xlab="Gestation Period (days)", include.lowest=TRUE, xlim=c(220, 280))
+# This line marks the mean and mystery animal on the graph
+abline(v=c(243, 248), col=c("red", "blue"), lwd=c(1, 3))
+```
+
+```{r}
+# This line generates the random numbers
+gorillaBirths <- rnorm(20, mean=257, sd=15)
+# This line graphs the results
+hist(gorillaBirths, breaks=20, main="Simulated Gorilla Births", xlab="Gestation Period (days)", include.lowest=TRUE, xlim=c(200, 300))
+# This line marks the mean and mystery animal on the graph
+abline(v=c(257, 248), col=c("red", "blue"), lwd=c(1, 3))
+```
+
+```{r}
+# This line generates the random numbers
+polarBearBirths <- rnorm(20, mean=230, sd=18)
+# This line graphs the results
+hist(polarBearBirths, breaks=20, main="Simulated Polar Bear Births", xlab="Gestation Period (days)", include.lowest=TRUE, xlim=c(180, 280))
+# This line marks the mean and mystery animal on the graph
+abline(v=c(230, 248), col=c("red", "blue"), lwd=c(1, 3))
+```
+
+Based on these simulations, I think that the mystery animal is a Chimpanzee. The mystery animal's gestation period looks closest to the center of the distribution and there are many Chimpanzee babys with roughly the same gestation period. 
+
+
+##Step 2
+
+I noticed that the standard deviation for the weight table was in ounces, so I converted the mean weight into ounces for the top 3 animals (based on weight). This should help me select my top 3 animals:
+
+Mystery Animal Weight = 32oz
+
+Gorilla: Mean Weight = 56oz, SD = 0.5
+
+Porcupine: Mean Weight = 16oz, SD = 0.25
+
+Chimpanzee: Mean Weight = 64oz, SD = 1.5
+
+
+Based on briefly looking at the weight and length data, my top three animals are:
+
+Polar Bear
+
+Lace Monitor
+
+Blue Stingray
+
+
+
+###Finding The Z-score and Percentile For Each Animal
+
+####Polar Bear:
+```{r}
+# Calculating the percentile + z-score in the Polar Bear distribution
+print(paste0("Percentile: ", pnorm(11, mean=12, sd=1.5)))
+print(paste0("Z-Score: ", (11-12)/1.5))
+```
+The mystery animal is longer than 25% of newborn Polar Bears. This makes Polar Bear a likely possibility for the mystery animal. 
+
+####Lace Monitor:
+```{r}
+# Calculating the percentile + z-score in the Gorilla distribution
+print(paste0("Percentile: ", pnorm(11, mean=12, sd=0.25)))
+print(paste0("Z-Score: ", (11-12)/0.25))
+```
+The mystery animal is shorter than 99.99...% percent of newborn Lace Monitors. This makes it a very unlikely possibility. 
+
+####Blue Stingray:
+```{r}
+# Calculating the percentile + z-score in the Stingray distribution
+print(paste0("Percentile: ", pnorm(11, mean=9, sd=2)))
+print(paste0("Z-Score: ", (11-9)/2))
+```
+The mystery animal is longer than 84.1% percent of newborn Blue Stingrays. This makes it a somewhat likely possibility, although not as likely as the Polar Bear. 
+
+
+Based on these calculations, the newborn baby is most likely a Polar Bear. The percentile of the mystery animal in the Polar Bear population is closest to 50% compared to the other animals. 
+
+
+##Conclusion
+
+According to my calculations, the mystery animal is most likely a Polar Bear, as it was the only animal that roughly matched both the gestation period data and the length/weight data.
+
+As seen in the histogram, there is still a large chunk of the population of newborns with a gestation period above 248 (the mystery animal). Although it may not be the best match compared to Chimps and Gorillas, it is the only one of those 3 that is remotely close to the mystery animal in weight/length. The length of the mystery animal ranks in the 25th percentile of Polar Bear newborns. This makes it a likely weight for a newborn Polar Bear. Compared to the other 2 candidates from length/weight, Polar Bear is the best option.
+
+
+##Application
+
+Another case where these types of calculations could be used is in Astronomy when scientists classify stars based on measurements. The mystery star may not be very well observed, so scientists use statistical methods like these to determine what kind of star it most likely is. 
