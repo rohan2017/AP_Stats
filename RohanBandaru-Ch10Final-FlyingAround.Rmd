@@ -1,0 +1,146 @@
+---
+title: "Ch10 Project - Flying Around"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+### Rohan Bandaru
+
+## Step 1
+I used "The Basic" and "The Stable" designs, and flew each plane 30 times at a target at the end of my hallway. I switched planes each throw to avoid my arm tiredness or skill improving from affecting the results.
+```{r}
+target = c("The Basic", "IIII", "IIIIIIIIIIIIIIIIIIIIIIIIII", "The Stable", "IIIIIIIIIIIII", "IIIIIIIIIIIIIIIII")
+asmatrix <- matrix(target, ncol=3, byrow=TRUE)
+rownames(asmatrix) <- c("", "")
+colnames(asmatrix) <- c("Design", "Hits", "Misses")
+as.table(asmatrix)
+```
+
+### State
+I will perform a 2-proportion significance test to determine whether one design outperforms the other. I will use a significance level of 95%, $\alpha = 0.05$.
+
+Null hypothesis: The proportion of target hits is the same for both plane designs
+
+Alternate hypothesis: The proportion of hits for "The Stable" is greater than the proportion of hits for "The Basic"
+
+### Plan
+Checking conditions:
+
+Random - These throws were random, no flights were ommitted, and they were independent, with me switching planes each throw and not compensating to hit the target.
+
+10% - It's safe to assume that these designs have been flown more than 300 times.
+
+Large Counts - While there are only 4 hits (less than 10) from the Basic design, I will proceed with the test.
+
+### Do
+
+Applying the difference in proportions z-test formula I get:
+$$z = \sqrt{p_1(1-p1)/n_1 + p_2(1-p_2)/n_2}$$
+Where $p_1=1\bar{3}$ and $p_2=0.4\bar{3}$
+
+Plugging in the numbers and evaluating gives us: $z = -2.5784$
+Plugging this into a normal distribution, we get a p value of: $p = 0.00496$
+
+### Conclude
+The p-value of 0.00496 is less than 0.05, so we reject the null hypothesis and conclude that "The Stable" design hits the target significantly more than "The Basic" design.
+
+
+## Step 2
+I will reuse the same designs as before, however I remade the planes to avoid the effect of damage from the previous tests. I had a separate observer use a stopwatch to record each flight and to mitigate measurement error.
+
+Initially, I tried this test indoors, but the planes would hit an obstacle before naturally landing, so I started throwing them from my window, subjecting the planes to some wind. However to mitigate this like before, I alternated designs each throw and threw them with minimal time gap.
+
+```{r}
+stable_flights = c(9, 8, 5, 7, 3, 8, 7, 8, 3, 2, 6, 8, 4, 5, 6, 7, 8, 9, 7, 6, 7, 3, 7, 8, 5, 5, 9, 7, 9, 3)
+basic_flights = c(4, 7, 3, 3, 4, 5, 3, 4, 4, 7, 7, 4, 5, 2, 6, 6, 5, 8, 4, 2, 6, 8, 5, 5, 6, 5, 6, 7, 6, 2)
+a <- matrix(0, nrow = 30, ncol = 3)
+a[1:30, 1] = seq(from = 1, to = 30, by = 1)
+a[1:30,2] = basic_flights
+a[1:30,3] = stable_flights
+asmatrix <- matrix(target, ncol=3, byrow=TRUE)
+rownames(a) <- c("", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "")
+colnames(a) <- c("Throw #", "The Basic (Seconds)", "The Stable (Seconds)")
+as.table(a)
+```
+
+### State
+I wil perform a 2-sample t-test for difference in population mean to determine if one design flies for longer than the other. I will use a significance level of 95%, $\alpha = 0.05$.
+
+Null Hypothesis: The mean flight time of both designs is the same
+
+Alternate Hypothesis: The mean flight time of "The Stable" is significantly higher than the mean flight time of "The Basic"
+
+### Plan
+Checking Conditions:
+
+Random - These throws were random, no flights were ommitted, and they were independent, with me switching planes each throw
+
+10% - It's safe to assume that these designs have been flown more than 300 times.
+
+Normal/Large Counts - I flew each design 30 times
+
+### Do
+Applying the formula for a 2-sample t-test I get:
+
+$$t = \frac{(\bar{x}_1-\bar{x}_2)-0}{\sqrt{s_1^2/n_1 + s_2^2/n_2}}$$
+```{r}
+print(paste0("t = ", paste0(mean(stable_flights)-mean(basic_flights), paste0(" / ", sqrt((sd(stable_flights)^2)/30 + (sd(basic_flights)^2)/30)))))
+print(paste0("t = ", (mean(stable_flights)-mean(basic_flights))/sqrt((sd(stable_flights)^2)/30 + (sd(basic_flights)^2)/30)))
+```
+
+Plugging this into the T-distribution, we get a p-value of: $p = 0.00548$
+
+### Conclude
+Because our p-value of 0.00548 is less than 0.05, we reject the null hypothesis and conclude that "The Stable" design has a significantly longer flight time vs "The Basic" design. 
+
+
+## Step 3
+```{r}
+computerPaper = c(518, 264, 564, 760, 427, 127, 683, 356, 830, 250)
+notebookPaper = c(366, 114, 417, 762, 427, 91, 465, 356, 670, 190)
+designs = c("Fast Hawk", "The Sprinter", "The Square Plane", "The Bird", "Spin Plane", "V-Wing", "Canard Plane", "Stunt Plane", "The Stable", "The Basic")
+b <- matrix(0, nrow = 10, ncol = 3)
+b[1:10,1] = designs
+b[1:10,2] = notebookPaper
+b[1:10,3] = computerPaper
+asmatrix <- matrix(target, ncol=3, byrow=TRUE)
+rownames(b) <- c("", "", "", "", "", "", "", "", "", "")
+colnames(b) <- c("Design", "Notebook Paper", "Computer Paper")
+as.table(b)
+```
+### State
+I wil perform a paired-data t-test for population mean to determine if planes made with notebook paper fly significantly farther than planes made from computer paper. I will use a significance level of 95%, $\alpha = 0.05$.
+
+Null Hypothesis: The mean distance for both types of paper is the same
+
+Alternate Hypothesis: The mean distance for notebook paper is farther than the mean distance for computer paper
+
+### Plan
+Checking Conditions:
+
+Random - These throws were random and they were independent
+
+10% - It's safe to assume that these designs have been flown more than 100 times.
+
+Normal/Large Counts - There are only 10 samples for each design, but the distribution looks roughly normal so I will continue
+```{r}
+hist(computerPaper, breaks = 4)
+hist(notebookPaper, breaks = 4)
+```
+
+
+### Do
+Applying the formula for a paired-data t-test I get:
+$$t = \frac{\bar{x}_d-0}{s_d/\sqrt{n}}$$
+```{r}
+differences = notebookPaper - computerPaper
+print(paste0("t = ", mean(differences)/(sd(differences)/sqrt(10))))
+```
+Plugging this into the T-distribution, we get a p-value of: $p = 0.9969$
+
+### Conclude
+Because our p-value of 0.9969 is far greater than 0.05, we fail to reject the null hypothesis and conclude that notebook paper has no signficant advantage over computer paper. Instead, this test suggests the opposite, that computer paper has a significant advantage over notebook paper. 
+
+## Final Conclusion
+Based on these significance tests, I conclude that "The Stable" design, constructed out of computer paper, is the best paper airplane for the competition. As seen in the first significance test, it drastically outperformed "The Basic", with a p-value of 0.005, hitting the target 13 out of 30 times. I do not have any accuracy from other designs, so this design is a safe option. Looking at the second test, we can see that it again outperforms "The Basic" in flight time, by a significant margin. Again, I do not have data from other planes, but this is why it's a safe option. Finally, based on the third significance test, "The Stable" made from computer paper outperformed all the other planes, going 830cm. Regardless, computer paper is still the best material, as seen from the test, with a p-value of 0.0031 (1-0.9969) showing that it's significantly better than notebook paper. For all these reasons, a "The Stable" made from computer paper is the best plane for the competition.
